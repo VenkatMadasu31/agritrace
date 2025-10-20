@@ -32,4 +32,6 @@ function App() {
   )
 }
 
+console.log("Auto-git test");
+
 export default App
