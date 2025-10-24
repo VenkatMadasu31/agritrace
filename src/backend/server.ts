@@ -1,11 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./db.ts";
+import "./firebaseAdmin.ts";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Connect MongoDB
 connectDB();
