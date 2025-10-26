@@ -1,11 +1,20 @@
+// src/pages/LoginPage.tsx
 import React, { useState, useEffect } from "react";
-import { auth, googleProvider, RecaptchaVerifier } from "../firebaseConfig";
+import { auth, googleProvider } from "../firebaseConfig";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithPhoneNumber,
-  ConfirmationResult,
+  RecaptchaVerifier,
 } from "firebase/auth";
+import type { ConfirmationResult } from "firebase/auth";
+
+// Extend window object to include recaptchaVerifier
+declare global {
+  interface Window {
+    recaptchaVerifier: RecaptchaVerifier;
+  }
+}
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -31,9 +40,9 @@ const LoginPage: React.FC = () => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Logged in with email!");
+      alert("✅ Logged in with email!");
     } catch (err: any) {
-      alert(err.message);
+      alert("❌ " + err.message);
     } finally {
       setLoading(false);
     }
@@ -44,9 +53,9 @@ const LoginPage: React.FC = () => {
     try {
       setLoading(true);
       await signInWithPopup(auth, googleProvider);
-      alert("Logged in with Google!");
+      alert("✅ Logged in with Google!");
     } catch (err: any) {
-      alert(err.message);
+      alert("❌ " + err.message);
     } finally {
       setLoading(false);
     }
@@ -60,9 +69,9 @@ const LoginPage: React.FC = () => {
       const appVerifier = window.recaptchaVerifier;
       const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
       setConfirmationResult(result);
-      alert("OTP sent!");
+      alert("✅ OTP sent!");
     } catch (err: any) {
-      alert(err.message);
+      alert("❌ " + err.message);
     } finally {
       setLoading(false);
     }
@@ -74,9 +83,9 @@ const LoginPage: React.FC = () => {
     try {
       setLoading(true);
       await confirmationResult.confirm(otp);
-      alert("Logged in with phone!");
+      alert("✅ Logged in with phone!");
     } catch (err: any) {
-      alert(err.message);
+      alert("❌ " + err.message);
     } finally {
       setLoading(false);
     }
@@ -89,29 +98,69 @@ const LoginPage: React.FC = () => {
 
         {/* Email login */}
         <div className="space-y-2">
-          <input type="email" placeholder="Email" className="w-full p-2 border rounded" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input type="password" placeholder="Password" className="w-full p-2 border rounded" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <button onClick={handleEmailLogin} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" disabled={loading}>
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full p-2 border rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full p-2 border rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            onClick={handleEmailLogin}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login with Email"}
           </button>
         </div>
 
         {/* Google login */}
-        <button onClick={handleGoogleLogin} className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600" disabled={loading}>
+        <button
+          onClick={handleGoogleLogin}
+          className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+          disabled={loading}
+        >
           {loading ? "Logging in..." : "Login with Google"}
         </button>
 
         {/* Phone login */}
         <div className="space-y-2">
-          <input type="tel" placeholder="Phone (+91XXXXXXXXXX)" className="w-full p-2 border rounded" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-          <button onClick={handleSendOtp} className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700" disabled={loading || confirmationResult !== null}>
+          <input
+            type="tel"
+            placeholder="Phone (+91XXXXXXXXXX)"
+            className="w-full p-2 border rounded"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          <button
+            onClick={handleSendOtp}
+            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+            disabled={loading || confirmationResult !== null}
+          >
             {loading ? "Sending OTP..." : "Send OTP"}
           </button>
 
           {confirmationResult && (
             <>
-              <input type="text" placeholder="Enter OTP" className="w-full p-2 border rounded" value={otp} onChange={(e) => setOtp(e.target.value)} />
-              <button onClick={handleVerifyOtp} className="w-full bg-green-800 text-white py-2 rounded hover:bg-green-900" disabled={loading}>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                className="w-full p-2 border rounded"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+              <button
+                onClick={handleVerifyOtp}
+                className="w-full bg-green-800 text-white py-2 rounded hover:bg-green-900"
+                disabled={loading}
+              >
                 {loading ? "Verifying OTP..." : "Verify OTP"}
               </button>
             </>
