@@ -6,10 +6,10 @@ import {
   signInWithPopup,
   signInWithPhoneNumber,
   RecaptchaVerifier,
+  ConfirmationResult as FirebaseConfirmationResult,
 } from "firebase/auth";
-import type { ConfirmationResult } from "firebase/auth";
 
-// Extend window object to include recaptchaVerifier
+// Extend window to include recaptchaVerifier
 declare global {
   interface Window {
     recaptchaVerifier: RecaptchaVerifier;
@@ -21,7 +21,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [confirmationResult, setConfirmationResult] = useState<FirebaseConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Initialize invisible reCAPTCHA
@@ -37,6 +37,7 @@ const LoginPage: React.FC = () => {
 
   // Email login
   const handleEmailLogin = async () => {
+    if (!email || !password) return alert("Enter email and password");
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
