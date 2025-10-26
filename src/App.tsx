@@ -4,7 +4,7 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import "./firebaseConfig";
-import DigilockerTest from "./pages/DigilockerTest";
+import DigilockerTest from "./pages/TestDigilocker";
 
 function App() {
   const [count, setCount] = useState(0);
