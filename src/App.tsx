@@ -1,67 +1,46 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import "./firebaseConfig";
-import DigilockerTest from "./pages/TestDigilocker";
+import React from "react";
+import "./App.css"; // make sure Tailwind is imported here
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <Router>
-      <div className="App">
-        {/* Header Section */}
-        <header className="flex flex-col items-center justify-center py-6">
-          <div className="flex space-x-4">
-            <a href="https://vite.dev" target="_blank" rel="noreferrer">
-              <img src={viteLogo} className="logo" alt="Vite logo" />
-            </a>
-            <a href="https://react.dev" target="_blank" rel="noreferrer">
-              <img src={reactLogo} className="logo react" alt="React logo" />
-            </a>
-          </div>
-          <h1>AgriTrace + Mock Digilocker</h1>
+    <div className="min-h-screen bg-gradient-to-r from-green-400 to-blue-500 flex flex-col">
+      {/* Top bar */}
+      <header className="flex justify-between items-center p-4 bg-white shadow-md">
+        <button className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">
+          Dashboard
+        </button>
 
-          {/* Navigation */}
-          <nav className="mt-4 space-x-4">
-            <Link to="/" className="text-blue-500 hover:underline">
-              Home
-            </Link>
-            <Link to="/digilocker-test" className="text-green-500 hover:underline">
-              Digilocker Test
-            </Link>
-          </nav>
-        </header>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Login
+        </button>
+      </header>
 
-        {/* Routes */}
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <div className="card text-center">
-                <button onClick={() => setCount((count) => count + 1)}>
-                  count is {count}
-                </button>
-                <p>
-                  Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
-                <p className="read-the-docs">
-                  Click on the Vite and React logos to learn more
-                </p>
-              </div>
-            }
-          />
+      {/* Centered content */}
+      <main className="flex-1 flex flex-col justify-center items-center text-center">
+        <h1 className="text-6xl font-extrabold text-white drop-shadow-lg animate-pulse">
+          Agritrace
+        </h1>
+        <p className="text-white mt-4 text-lg drop-shadow-md">
+          Your farm-to-fork traceability platform
+        </p>
 
-          {/* Digilocker Test Page */}
-          <Route path="/digilocker-test" element={<DigilockerTest />} />
-        </Routes>
-      </div>
-    </Router>
+        {/* Example buttons below title */}
+        <div className="mt-8 space-x-4">
+          <button className="bg-white text-green-600 px-6 py-3 rounded-lg shadow-md hover:bg-gray-100 transition">
+            Get Started
+          </button>
+          <button className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition">
+            Learn More
+          </button>
+        </div>
+      </main>
+
+      {/* Footer if needed */}
+      <footer className="p-4 text-center text-white">
+        &copy; {new Date().getFullYear()} Agritrace. All rights reserved.
+      </footer>
+    </div>
   );
 }
-
-console.log("AgriTrace connected with Mock Digilocker successfully ✅");
 
 export default App;
