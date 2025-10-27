@@ -9,7 +9,7 @@ import {
   type ConfirmationResult as FirebaseConfirmationResult,
 } from "firebase/auth";
 
-// Extend window to include recaptchaVerifier
+// Extend window type to include recaptchaVerifier
 declare global {
   interface Window {
     recaptchaVerifier: RecaptchaVerifier;
@@ -25,14 +25,14 @@ const LoginPage: React.FC = () => {
     useState<FirebaseConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Initialize invisible reCAPTCHA safely
+  // ✅ Initialize reCAPTCHA safely (correct parameter order)
   useEffect(() => {
-    if (!window.recaptchaVerifier && auth) {
+    if (!window.recaptchaVerifier) {
       try {
         window.recaptchaVerifier = new RecaptchaVerifier(
-          auth, // ✅ Correct order: auth first
-          "recaptcha-container",
-          { size: "invisible" }
+          "recaptcha-container", // ✅ element id first
+          { size: "invisible" },  // ✅ config second
+          auth                    // ✅ auth last
         );
         console.log("✅ reCAPTCHA initialized");
       } catch (err) {
@@ -101,56 +101,72 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-6">
-        <h1 className="text-2xl font-bold text-center">Login to Agritrace</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-8">
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          Login to Agritrace
+        </h1>
 
-        {/* Email login */}
-        <div className="space-y-2">
+        {/* ===== EMAIL LOGIN ===== */}
+        <div className="space-y-3">
           <input
             type="email"
             placeholder="Email"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-400 outline-none"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-400 outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
             onClick={handleEmailLogin}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition"
             disabled={loading}
           >
             {loading ? "Logging in..." : "Login with Email"}
           </button>
         </div>
 
-        {/* Google login */}
+        {/* Divider */}
+        <div className="flex items-center justify-center space-x-3">
+          <div className="w-1/4 h-px bg-gray-300"></div>
+          <span className="text-gray-500 text-sm">or</span>
+          <div className="w-1/4 h-px bg-gray-300"></div>
+        </div>
+
+        {/* ===== GOOGLE LOGIN ===== */}
         <button
           onClick={handleGoogleLogin}
-          className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+          className="w-full bg-red-500 text-white py-2.5 rounded-lg hover:bg-red-600 transition"
           disabled={loading}
         >
           {loading ? "Logging in..." : "Login with Google"}
         </button>
 
-        {/* Phone login */}
-        <div className="space-y-2">
+        {/* Divider */}
+        <div className="flex items-center justify-center space-x-3">
+          <div className="w-1/4 h-px bg-gray-300"></div>
+          <span className="text-gray-500 text-sm">or</span>
+          <div className="w-1/4 h-px bg-gray-300"></div>
+        </div>
+
+        {/* ===== PHONE LOGIN ===== */}
+        <div className="space-y-3">
           <input
             type="tel"
             placeholder="Phone (+91XXXXXXXXXX)"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded focus:ring-2 focus:ring-green-400 outline-none"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
           />
           <button
             onClick={handleSendOtp}
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+            className="w-full bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 transition"
             disabled={loading || confirmationResult !== null}
           >
             {loading ? "Sending OTP..." : "Send OTP"}
@@ -161,13 +177,13 @@ const LoginPage: React.FC = () => {
               <input
                 type="text"
                 placeholder="Enter OTP"
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded focus:ring-2 focus:ring-green-400 outline-none"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
               />
               <button
                 onClick={handleVerifyOtp}
-                className="w-full bg-green-800 text-white py-2 rounded hover:bg-green-900"
+                className="w-full bg-green-800 text-white py-2.5 rounded-lg hover:bg-green-900 transition"
                 disabled={loading}
               >
                 {loading ? "Verifying OTP..." : "Verify OTP"}
