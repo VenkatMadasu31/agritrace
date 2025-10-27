@@ -27,16 +27,16 @@ const LoginPage: React.FC = () => {
 
   // ✅ Initialize reCAPTCHA safely (correct parameter order)
   useEffect(() => {
-    if (!window.recaptchaVerifier) {
+    if (!window.recaptchaVerifier && auth) {
       try {
         window.recaptchaVerifier = new RecaptchaVerifier(
-          "recaptcha-container", // ✅ element id first
-          { size: "invisible" },  // ✅ config second
-          auth                    // ✅ auth last
+          auth, // ✅ Correct order: auth first
+          "recaptcha-container",
+          { size: "invisible" }
         );
         console.log("✅ reCAPTCHA initialized");
       } catch (err) {
-        console.error("⚠️ Error initializing reCAPTCHA:", err);
+        console.error("⚠ Error initializing reCAPTCHA:", err);
       }
     }
   }, []);
