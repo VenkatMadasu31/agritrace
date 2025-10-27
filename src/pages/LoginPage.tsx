@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { auth, googleProvider } from "../firebaseConfig";
 import {
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signInWithPopup,
   signInWithPhoneNumber,
   RecaptchaVerifier,
@@ -17,6 +18,7 @@ declare global {
 }
 
 const LoginPage: React.FC = () => {
+  const [isSignup, setIsSignup] = useState(false); // ✅ Mode toggle (Login / Signup)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -25,12 +27,12 @@ const LoginPage: React.FC = () => {
     useState<FirebaseConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Initialize reCAPTCHA safely (correct parameter order)
+  // ✅ Initialize reCAPTCHA safely
   useEffect(() => {
     if (!window.recaptchaVerifier && auth) {
       try {
         window.recaptchaVerifier = new RecaptchaVerifier(
-          auth, // ✅ Correct order: auth first
+          auth,
           "recaptcha-container",
           { size: "invisible" }
         );
@@ -41,13 +43,18 @@ const LoginPage: React.FC = () => {
     }
   }, []);
 
-  // ✅ Email login
-  const handleEmailLogin = async () => {
+  // ✅ Email Auth (Login/Signup based on mode)
+  const handleEmailAuth = async () => {
     if (!email || !password) return alert("Enter email and password");
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("✅ Logged in with email!");
+      if (isSignup) {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("✅ Account created successfully!");
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("✅ Logged in successfully!");
+      }
     } catch (err: any) {
       alert("❌ " + err.message);
     } finally {
@@ -55,12 +62,12 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  // ✅ Google login
-  const handleGoogleLogin = async () => {
+  // ✅ Google Auth (Login/Signup unified)
+  const handleGoogleAuth = async () => {
     try {
       setLoading(true);
       await signInWithPopup(auth, googleProvider);
-      alert("✅ Logged in with Google!");
+      alert(isSignup ? "✅ Account created with Google!" : "✅ Logged in with Google!");
     } catch (err: any) {
       alert("❌ " + err.message);
     } finally {
@@ -91,7 +98,7 @@ const LoginPage: React.FC = () => {
     try {
       setLoading(true);
       await confirmationResult.confirm(otp);
-      alert("✅ Logged in with phone!");
+      alert(isSignup ? "✅ Phone signup successful!" : "✅ Logged in with phone!");
     } catch (err: any) {
       console.error(err);
       alert("❌ " + err.message);
@@ -104,10 +111,10 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-8">
         <h1 className="text-3xl font-bold text-center text-gray-800">
-          Login to Agritrace
+          {isSignup ? "Create Account" : "Login to Agritrace"}
         </h1>
 
-        {/* ===== EMAIL LOGIN ===== */}
+        {/* ===== EMAIL AUTH ===== */}
         <div className="space-y-3">
           <input
             type="email"
@@ -124,11 +131,17 @@ const LoginPage: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
-            onClick={handleEmailLogin}
+            onClick={handleEmailAuth}
             className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login with Email"}
+            {loading
+              ? isSignup
+                ? "Creating..."
+                : "Logging in..."
+              : isSignup
+              ? "Sign Up with Email"
+              : "Login with Email"}
           </button>
         </div>
 
@@ -139,13 +152,19 @@ const LoginPage: React.FC = () => {
           <div className="w-1/4 h-px bg-gray-300"></div>
         </div>
 
-        {/* ===== GOOGLE LOGIN ===== */}
+        {/* ===== GOOGLE AUTH ===== */}
         <button
-          onClick={handleGoogleLogin}
+          onClick={handleGoogleAuth}
           className="w-full bg-red-500 text-white py-2.5 rounded-lg hover:bg-red-600 transition"
           disabled={loading}
         >
-          {loading ? "Logging in..." : "Login with Google"}
+          {loading
+            ? isSignup
+              ? "Creating with Google..."
+              : "Logging in..."
+            : isSignup
+            ? "Sign Up with Google"
+            : "Login with Google"}
         </button>
 
         {/* Divider */}
@@ -155,7 +174,7 @@ const LoginPage: React.FC = () => {
           <div className="w-1/4 h-px bg-gray-300"></div>
         </div>
 
-        {/* ===== PHONE LOGIN ===== */}
+        {/* ===== PHONE AUTH ===== */}
         <div className="space-y-3">
           <input
             type="tel"
@@ -186,7 +205,13 @@ const LoginPage: React.FC = () => {
                 className="w-full bg-green-800 text-white py-2.5 rounded-lg hover:bg-green-900 transition"
                 disabled={loading}
               >
-                {loading ? "Verifying OTP..." : "Verify OTP"}
+                {loading
+                  ? isSignup
+                    ? "Verifying Signup..."
+                    : "Verifying Login..."
+                  : isSignup
+                  ? "Sign Up with OTP"
+                  : "Login with OTP"}
               </button>
             </>
           )}
@@ -194,6 +219,22 @@ const LoginPage: React.FC = () => {
 
         {/* reCAPTCHA container */}
         <div id="recaptcha-container"></div>
+
+        {/* ===== MODE TOGGLE ===== */}
+        <div className="text-center mt-4">
+          <p className="text-gray-600 text-sm">
+            {isSignup ? "Already have an account?" : "New user?"}{" "}
+            <button
+              onClick={() => {
+                setIsSignup(!isSignup);
+                setConfirmationResult(null);
+              }}
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              {isSignup ? "Login here" : "Sign up here"}
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
