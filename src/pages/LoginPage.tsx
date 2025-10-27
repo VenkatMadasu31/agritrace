@@ -27,23 +27,31 @@ const LoginPage: React.FC = () => {
     useState<FirebaseConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Initialize reCAPTCHA safely
+  // ✅ Initialize reCAPTCHA (visible mode)
   useEffect(() => {
     if (!window.recaptchaVerifier && auth) {
       try {
         window.recaptchaVerifier = new RecaptchaVerifier(
           auth,
           "recaptcha-container",
-          { size: "invisible" }
+          {
+            size: "normal", // 👈 visible reCAPTCHA
+            callback: (response: any) => {
+              console.log("✅ reCAPTCHA solved:", response);
+            },
+            "expired-callback": () => {
+              console.warn("⚠ reCAPTCHA expired");
+            },
+          }
         );
-        console.log("✅ reCAPTCHA initialized");
+        console.log("✅ Visible reCAPTCHA initialized");
       } catch (err) {
         console.error("⚠ Error initializing reCAPTCHA:", err);
       }
     }
   }, []);
 
-  // ✅ Email Auth (Login/Signup based on mode)
+  // ✅ Email Auth (Login / Signup)
   const handleEmailAuth = async () => {
     if (!email || !password) return alert("Enter email and password");
     try {
@@ -62,7 +70,7 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  // ✅ Google Auth (Login/Signup unified)
+  // ✅ Google Auth
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
@@ -217,8 +225,8 @@ const LoginPage: React.FC = () => {
           )}
         </div>
 
-        {/* reCAPTCHA container */}
-        <div id="recaptcha-container"></div>
+        {/* ✅ Visible reCAPTCHA container (centered) */}
+        <div id="recaptcha-container" className="flex justify-center mt-4"></div>
 
         {/* ===== MODE TOGGLE ===== */}
         <div className="text-center mt-4">
