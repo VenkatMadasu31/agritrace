@@ -6,7 +6,7 @@ import {
   signInWithPopup,
   signInWithPhoneNumber,
   RecaptchaVerifier,
-type ConfirmationResult as FirebaseConfirmationResult,
+  type ConfirmationResult as FirebaseConfirmationResult,
 } from "firebase/auth";
 
 // Extend window to include recaptchaVerifier
@@ -21,21 +21,27 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
-  const [confirmationResult, setConfirmationResult] = useState<FirebaseConfirmationResult | null>(null);
+  const [confirmationResult, setConfirmationResult] =
+    useState<FirebaseConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Initialize invisible reCAPTCHA
+  // ✅ Initialize invisible reCAPTCHA safely
   useEffect(() => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        "recaptcha-container",
-        { size: "invisible" },
-        auth
-      );
+    if (!window.recaptchaVerifier && auth) {
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth, // ✅ Correct order: auth first
+          "recaptcha-container",
+          { size: "invisible" }
+        );
+        console.log("✅ reCAPTCHA initialized");
+      } catch (err) {
+        console.error("⚠️ Error initializing reCAPTCHA:", err);
+      }
     }
   }, []);
 
-  // Email login
+  // ✅ Email login
   const handleEmailLogin = async () => {
     if (!email || !password) return alert("Enter email and password");
     try {
@@ -49,7 +55,7 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  // Google login
+  // ✅ Google login
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
@@ -62,7 +68,7 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  // Send OTP
+  // ✅ Send OTP
   const handleSendOtp = async () => {
     if (!phoneNumber) return alert("Enter phone number");
     try {
@@ -72,13 +78,14 @@ const LoginPage: React.FC = () => {
       setConfirmationResult(result);
       alert("✅ OTP sent!");
     } catch (err: any) {
+      console.error(err);
       alert("❌ " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Verify OTP
+  // ✅ Verify OTP
   const handleVerifyOtp = async () => {
     if (!otp || !confirmationResult) return alert("Enter OTP");
     try {
@@ -86,6 +93,7 @@ const LoginPage: React.FC = () => {
       await confirmationResult.confirm(otp);
       alert("✅ Logged in with phone!");
     } catch (err: any) {
+      console.error(err);
       alert("❌ " + err.message);
     } finally {
       setLoading(false);
