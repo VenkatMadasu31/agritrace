@@ -1,9 +1,15 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 import "./App.css";
 import LoginPage from "./pages/LoginPage";
-import MockDigiLocker from "./pages/MockDigiLocker"; // ✅ import new page
+import MockDigiLocker from "./pages/MockDigiLocker"; // ✅ Import DigiLocker Page
 
+// 🏡 Home Component
 function Home() {
   const navigate = useNavigate();
 
@@ -22,7 +28,7 @@ function Home() {
         Login
       </button>
 
-      {/* Center title */}
+      {/* Centered Title */}
       <div className="flex items-center justify-center h-screen">
         <h1 className="text-7xl font-extrabold text-white drop-shadow-lg animate-pulse">
           Agritrace
@@ -32,13 +38,14 @@ function Home() {
   );
 }
 
+// 🌱 Main App Component with Routes
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/mock-digilocker" element={<MockDigiLocker />} /> {/* ✅ new route */}
+        <Route path="/mock-digilocker" element={<MockDigiLocker />} /> {/* ✅ New Route */}
       </Routes>
     </Router>
   );
