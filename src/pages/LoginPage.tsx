@@ -6,7 +6,7 @@ import {
   signInWithPopup,
   signInWithPhoneNumber,
   RecaptchaVerifier,
-  ConfirmationResult as FirebaseConfirmationResult,
+type ConfirmationResult as FirebaseConfirmationResult,
 } from "firebase/auth";
 
 // Extend window to include recaptchaVerifier
