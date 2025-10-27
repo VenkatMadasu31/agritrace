@@ -7,27 +7,39 @@ const MockDigiLocker: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  // 📡 Function to verify using Mock DigiLocker API
   const handleVerify = async () => {
     if (!phone) return alert("📱 Please enter your phone number!");
     if (!consent) return alert("⚠️ Please give your consent to proceed.");
 
     setLoading(true);
+    setVerified(false);
+    setUserData(null);
 
-    // Simulate DigiLocker API response delay
-    setTimeout(() => {
-      setLoading(false);
-      setVerified(true);
-
-      // Mock data (replace later with actual DigiLocker API response)
-      setUserData({
-        name: "M Venkat",
-        dob: "2005-02-17",
-        aadhaar: "XXXX-XXXX-9876",
-        address: "Karimnagar, Telangana",
-        gender: "Male",
-        email: "venkat.m@example.com",
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch("http://localhost:5000/mock-digilocker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
       });
-    }, 2000);
+
+      if (!response.ok) throw new Error("Server error, please try again later.");
+
+      const data = await response.json();
+
+      if (data?.userDetails) {
+        setUserData(data.userDetails);
+        setVerified(true);
+      } else {
+        alert("❌ User not found. Please check your phone number.");
+      }
+    } catch (err: any) {
+      console.error("Error verifying user:", err);
+      alert("⚠️ Verification failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -88,6 +100,7 @@ const MockDigiLocker: React.FC = () => {
               <h2 className="text-xl font-semibold text-green-600 text-center mb-4">
                 ✅ Verification Successful
               </h2>
+
               {userData && (
                 <ul className="text-gray-700 space-y-2">
                   <li>
@@ -97,16 +110,19 @@ const MockDigiLocker: React.FC = () => {
                     <strong>DOB:</strong> {userData.dob}
                   </li>
                   <li>
-                    <strong>Aadhaar:</strong> {userData.aadhaar}
+                    <strong>Aadhaar:</strong> {userData.aadhaarNumber}
                   </li>
                   <li>
                     <strong>Gender:</strong> {userData.gender}
                   </li>
                   <li>
-                    <strong>Email:</strong> {userData.email}
+                    <strong>Phone:</strong> {userData.phone}
                   </li>
                   <li>
-                    <strong>Address:</strong> {userData.address}
+                    <strong>Address:</strong> {userData.permanentAddress}
+                  </li>
+                  <li>
+                    <strong>Pincode:</strong> {userData.pincode}
                   </li>
                 </ul>
               )}
