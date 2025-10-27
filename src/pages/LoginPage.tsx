@@ -1,5 +1,5 @@
-// src/pages/LoginPage.tsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ added
 import { auth, googleProvider } from "../firebaseConfig";
 import {
   signInWithEmailAndPassword,
@@ -18,6 +18,7 @@ declare global {
 }
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate(); // ✅ for navigation
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +36,7 @@ const LoginPage: React.FC = () => {
           auth,
           "recaptcha-container",
           {
-            size: "normal", // visible reCAPTCHA (bottom)
+            size: "normal",
             callback: () => console.log("✅ Phone reCAPTCHA solved"),
             "expired-callback": () => {
               alert("⚠️ reCAPTCHA expired, please verify again.");
@@ -63,6 +64,7 @@ const LoginPage: React.FC = () => {
         await signInWithEmailAndPassword(auth, email, password);
         alert("✅ Logged in successfully!");
       }
+      navigate("/mock-digilocker"); // ✅ Redirect after success
     } catch (err: any) {
       alert("❌ " + err.message);
     } finally {
@@ -76,6 +78,7 @@ const LoginPage: React.FC = () => {
       setLoading(true);
       await signInWithPopup(auth, googleProvider);
       alert(isSignup ? "✅ Account created with Google!" : "✅ Logged in with Google!");
+      navigate("/mock-digilocker"); // ✅ Redirect
     } catch (err: any) {
       alert("❌ " + err.message);
     } finally {
@@ -107,6 +110,7 @@ const LoginPage: React.FC = () => {
       setLoading(true);
       await confirmationResult.confirm(otp);
       alert(isSignup ? "✅ Phone signup successful!" : "✅ Logged in with phone!");
+      navigate("/mock-digilocker"); // ✅ Redirect after OTP verified
     } catch (err: any) {
       console.error(err);
       alert("❌ " + err.message);
