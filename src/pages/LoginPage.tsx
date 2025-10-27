@@ -9,7 +9,6 @@ import {
   RecaptchaVerifier,
   type ConfirmationResult as FirebaseConfirmationResult,
 } from "firebase/auth";
-import ReCAPTCHA from "react-google-recaptcha";
 
 // Extend window type to include recaptchaVerifier
 declare global {
@@ -18,56 +17,41 @@ declare global {
   }
 }
 
-const SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY"; // 🔑 replace with your Google reCAPTCHA v2 key
-
 const LoginPage: React.FC = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [confirmationResult, setConfirmationResult] =
     useState<FirebaseConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Initialize reCAPTCHA for phone login
+  // ✅ Initialize reCAPTCHA for phone login only
   useEffect(() => {
-  if (!window.recaptchaVerifier && auth) {
-    try {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth, // ✅ first argument: auth instance
-        "recaptcha-container", // ✅ second: container ID
-        {
-          size: "normal", // ✅ visible reCAPTCHA
-          callback: () => console.log("✅ Phone reCAPTCHA solved"),
-          "expired-callback": () => {
-            alert("⚠️ reCAPTCHA expired, please verify again.");
-          },
-        }
-      );
-      window.recaptchaVerifier.render();
-      console.log("✅ Visible Phone reCAPTCHA initialized");
-    } catch (err) {
-      console.error("⚠️ Error initializing reCAPTCHA:", err);
+    if (!window.recaptchaVerifier && auth) {
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          "recaptcha-container",
+          {
+            size: "normal", // visible reCAPTCHA (bottom)
+            callback: () => console.log("✅ Phone reCAPTCHA solved"),
+            "expired-callback": () => {
+              alert("⚠️ reCAPTCHA expired, please verify again.");
+            },
+          }
+        );
+        window.recaptchaVerifier.render();
+        console.log("✅ Visible Phone reCAPTCHA initialized");
+      } catch (err) {
+        console.error("⚠️ Error initializing reCAPTCHA:", err);
+      }
     }
-  }
-}, []);
-
-
-  // ✅ Handle visible reCAPTCHA for email/google
-  const handleCaptchaChange = (value: string | null) => {
-    if (value) {
-      console.log("✅ reCAPTCHA token:", value);
-      setCaptchaVerified(true);
-    } else {
-      setCaptchaVerified(false);
-    }
-  };
+  }, []);
 
   // ✅ Email Auth (Login / Signup)
   const handleEmailAuth = async () => {
-    if (!captchaVerified) return alert("Please verify reCAPTCHA first!");
     if (!email || !password) return alert("Enter email and password");
 
     try {
@@ -88,8 +72,6 @@ const LoginPage: React.FC = () => {
 
   // ✅ Google Auth
   const handleGoogleAuth = async () => {
-    if (!captchaVerified) return alert("Please verify reCAPTCHA first!");
-
     try {
       setLoading(true);
       await signInWithPopup(auth, googleProvider);
@@ -139,11 +121,6 @@ const LoginPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-center text-gray-800">
           {isSignup ? "Create Account" : "Login to Agritrace"}
         </h1>
-
-        {/* ===== Visible reCAPTCHA for all (email + Google) ===== */}
-        <div className="flex justify-center">
-          <ReCAPTCHA sitekey={SITE_KEY} onChange={handleCaptchaChange} />
-        </div>
 
         {/* ===== EMAIL AUTH ===== */}
         <div className="space-y-3">
@@ -248,7 +225,7 @@ const LoginPage: React.FC = () => {
           )}
         </div>
 
-        {/* ✅ Visible Phone reCAPTCHA container */}
+        {/* ✅ Only one visible reCAPTCHA now */}
         <div id="recaptcha-container" className="flex justify-center mt-4"></div>
 
         {/* ===== MODE TOGGLE ===== */}
