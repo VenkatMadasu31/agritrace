@@ -33,26 +33,27 @@ const LoginPage: React.FC = () => {
 
   // ✅ Initialize reCAPTCHA for phone login
   useEffect(() => {
-    if (!window.recaptchaVerifier && auth) {
-      try {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          "recaptcha-container",
-          {
-            size: "normal",
-            callback: () => console.log("✅ Phone reCAPTCHA solved"),
-            "expired-callback": () => {
-              alert("⚠️ reCAPTCHA expired, please verify again.");
-            },
+  if (!window.recaptchaVerifier && auth) {
+    try {
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth, // ✅ first argument: auth instance
+        "recaptcha-container", // ✅ second: container ID
+        {
+          size: "normal", // ✅ visible reCAPTCHA
+          callback: () => console.log("✅ Phone reCAPTCHA solved"),
+          "expired-callback": () => {
+            alert("⚠️ reCAPTCHA expired, please verify again.");
           },
-          auth
-        );
-        window.recaptchaVerifier.render();
-        console.log("✅ Visible Phone reCAPTCHA initialized");
-      } catch (err) {
-        console.error("⚠ Error initializing reCAPTCHA:", err);
-      }
+        }
+      );
+      window.recaptchaVerifier.render();
+      console.log("✅ Visible Phone reCAPTCHA initialized");
+    } catch (err) {
+      console.error("⚠️ Error initializing reCAPTCHA:", err);
     }
-  }, []);
+  }
+}, []);
+
 
   // ✅ Handle visible reCAPTCHA for email/google
   const handleCaptchaChange = (value: string | null) => {
