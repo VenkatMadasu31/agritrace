@@ -29,8 +29,8 @@ const UserDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center overflow-y-auto py-8 px-4">
+      <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-2xl">
         <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
           User Details (Auto-filled from DigiLocker)
         </h1>
@@ -42,7 +42,7 @@ const UserDetailsPage: React.FC = () => {
               Profile Picture <span className="text-red-500">*</span>
             </label>
 
-            <div className="relative w-20 h-20 rounded-full border-2 border-dashed border-gray-400 flex items-center justify-center overflow-hidden cursor-pointer hover:border-green-500 transition duration-300">
+            <div className="relative w-24 h-24 rounded-full border-2 border-dashed border-gray-400 flex items-center justify-center overflow-hidden cursor-pointer hover:border-green-500 transition duration-300">
               {preview ? (
                 <img
                   src={preview}
@@ -98,7 +98,7 @@ const UserDetailsPage: React.FC = () => {
             </label>
           </div>
 
-          {/* Present Address (editable only if checked) */}
+          {/* Present Address */}
           {isDifferentAddress && (
             <div>
               <label className="block font-semibold text-gray-700 mb-1">
