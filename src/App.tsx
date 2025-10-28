@@ -6,8 +6,11 @@ import {
   useNavigate,
 } from "react-router-dom";
 import "./App.css";
+
+// ✅ Import Pages
 import LoginPage from "./pages/LoginPage";
-import MockDigiLocker from "./pages/MockDigiLocker"; // ✅ Import DigiLocker Page
+import MockDigiLocker from "./pages/MockDigiLocker";
+import UserDetailsPage from "./pages/UserDetailsPage"; // ✅ New Page
 
 // 🏡 Home Component
 function Home() {
@@ -43,9 +46,17 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* 🏠 Home Page */}
         <Route path="/" element={<Home />} />
+
+        {/* 🔐 Login Page */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/mock-digilocker" element={<MockDigiLocker />} /> {/* ✅ New Route */}
+
+        {/* 🪪 Mock DigiLocker Verification */}
+        <Route path="/mock-digilocker" element={<MockDigiLocker />} />
+
+        {/* 👤 User Details (Auto-filled from DigiLocker) */}
+        <Route path="/user-details" element={<UserDetailsPage />} />
       </Routes>
     </Router>
   );
