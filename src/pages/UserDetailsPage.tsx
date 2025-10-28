@@ -37,20 +37,20 @@ const UserDetailsPage: React.FC = () => {
 
         <form className="space-y-4">
           {/* Profile Picture Upload */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center mb-6">
             <label className="block font-semibold text-gray-700 mb-2">
               Profile Picture <span className="text-red-500">*</span>
             </label>
 
-            <div className="relative w-32 h-32 rounded-full border-4 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:border-green-500 transition duration-300">
+            <div className="relative w-20 h-20 rounded-full border-2 border-dashed border-gray-400 flex items-center justify-center overflow-hidden cursor-pointer hover:border-green-500 transition duration-300">
               {preview ? (
                 <img
                   src={preview}
                   alt="Profile Preview"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-full"
                 />
               ) : (
-                <span className="text-gray-500 text-sm text-center px-2">
+                <span className="text-gray-500 text-xs text-center px-2">
                   Click to upload
                 </span>
               )}
