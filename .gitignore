@@ -29,3 +29,7 @@ dist/
 .vscode/
 .env
 *.log
+
+# Ignore Firebase credentials
+src/backend/firebaseServiceAccountKey.json
+
