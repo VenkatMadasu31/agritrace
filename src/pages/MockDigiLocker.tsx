@@ -5,7 +5,7 @@ const MockDigiLocker: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
   const [verified, setVerified] = useState(false);
-  const [responseData, setResponseData] = useState<any>(null);
+  const [userDetails, setUserDetails] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const handleVerify = async () => {
@@ -14,7 +14,7 @@ const MockDigiLocker: React.FC = () => {
 
     setLoading(true);
     setVerified(false);
-    setResponseData(null);
+    setUserDetails(null);
 
     try {
       // ✅ Backend API endpoint for verification
@@ -22,11 +22,15 @@ const MockDigiLocker: React.FC = () => {
         phone: phone,
       });
 
-      console.log("📦 Full server response:", res.data); // <-- Debug in console
+      console.log("📦 Full server response:", res.data); // Debug only
 
-      // ✅ Store full response (for complete inspection)
-      setResponseData(res.data);
-      setVerified(true);
+      // ✅ Store only user details (not tokens)
+      if (res.data?.userDetails) {
+        setUserDetails(res.data.userDetails);
+        setVerified(true);
+      } else {
+        alert("⚠️ No user details found in response.");
+      }
     } catch (err: any) {
       console.error("❌ Error verifying user:", err);
       alert(
@@ -84,22 +88,49 @@ const MockDigiLocker: React.FC = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE — Data Display */}
-        <div className="flex flex-col items-center justify-center bg-gray-50 border rounded-xl p-6 overflow-y-auto max-h-[75vh]">
+        {/* RIGHT SIDE — Formatted User Data Display */}
+        <div className="flex flex-col items-start justify-center bg-gray-50 border rounded-xl p-6 overflow-y-auto max-h-[75vh]">
           {!verified ? (
-            <p className="text-gray-500 text-center">
+            <p className="text-gray-500 text-center w-full">
               🔒 Your DigiLocker data will appear here after verification.
             </p>
           ) : (
-            <div className="w-full space-y-4">
-              <h2 className="text-xl font-semibold text-green-600 text-center mb-4">
+            <div className="w-full">
+              <h2 className="text-xl font-semibold text-green-600 text-center mb-6">
                 ✅ Verification Successful
               </h2>
 
-              {/* ✅ Display everything dynamically */}
-              <pre className="bg-gray-100 p-3 rounded-lg text-sm text-gray-800 overflow-x-auto whitespace-pre-wrap">
-                {JSON.stringify(responseData, null, 2)}
-              </pre>
+              <div className="space-y-3 text-gray-800 text-sm">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold">📞 Phone:</span>
+                  <span>{userDetails.phone}</span>
+                </div>
+
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold">👤 Name:</span>
+                  <span>{userDetails.name}</span>
+                </div>
+
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold">🎂 Date of Birth:</span>
+                  <span>{userDetails.dob}</span>
+                </div>
+
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold">🏠 Address:</span>
+                  <span className="text-right">{userDetails.permanentAddress}</span>
+                </div>
+
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold">📮 Pincode:</span>
+                  <span>{userDetails.pincode}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="font-semibold">🚻 Gender:</span>
+                  <span>{userDetails.gender}</span>
+                </div>
+              </div>
             </div>
           )}
         </div>
