@@ -1,42 +1,37 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const MockDigiLocker: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
   const [verified, setVerified] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
+  const [responseData, setResponseData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // 📡 Function to verify using Mock DigiLocker API
   const handleVerify = async () => {
     if (!phone) return alert("📱 Please enter your phone number!");
     if (!consent) return alert("⚠️ Please give your consent to proceed.");
 
     setLoading(true);
     setVerified(false);
-    setUserData(null);
+    setResponseData(null);
 
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch("http://localhost:5000/mock-digilocker", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+      // ✅ Backend API endpoint for verification
+      const res = await axios.post("http://localhost:5000/consent/verify", {
+        phone: phone,
       });
 
-      if (!response.ok) throw new Error("Server error, please try again later.");
+      console.log("📦 Full server response:", res.data); // <-- Debug in console
 
-      const data = await response.json();
-
-      if (data?.userDetails) {
-        setUserData(data.userDetails);
-        setVerified(true);
-      } else {
-        alert("❌ User not found. Please check your phone number.");
-      }
+      // ✅ Store full response (for complete inspection)
+      setResponseData(res.data);
+      setVerified(true);
     } catch (err: any) {
-      console.error("Error verifying user:", err);
-      alert("⚠️ Verification failed. Please try again.");
+      console.error("❌ Error verifying user:", err);
+      alert(
+        err.response?.data?.message || "⚠️ Verification failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -44,7 +39,7 @@ const MockDigiLocker: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* LEFT SIDE — Input Section */}
         <div>
           <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
@@ -89,43 +84,22 @@ const MockDigiLocker: React.FC = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE — DigiLocker Data Display */}
-        <div className="flex flex-col items-center justify-center bg-gray-50 border rounded-xl p-6">
+        {/* RIGHT SIDE — Data Display */}
+        <div className="flex flex-col items-center justify-center bg-gray-50 border rounded-xl p-6 overflow-y-auto max-h-[75vh]">
           {!verified ? (
             <p className="text-gray-500 text-center">
               🔒 Your DigiLocker data will appear here after verification.
             </p>
           ) : (
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-4">
               <h2 className="text-xl font-semibold text-green-600 text-center mb-4">
                 ✅ Verification Successful
               </h2>
 
-              {userData && (
-                <ul className="text-gray-700 space-y-2">
-                  <li>
-                    <strong>Name:</strong> {userData.name}
-                  </li>
-                  <li>
-                    <strong>DOB:</strong> {userData.dob}
-                  </li>
-                  <li>
-                    <strong>Aadhaar:</strong> {userData.aadhaarNumber}
-                  </li>
-                  <li>
-                    <strong>Gender:</strong> {userData.gender}
-                  </li>
-                  <li>
-                    <strong>Phone:</strong> {userData.phone}
-                  </li>
-                  <li>
-                    <strong>Address:</strong> {userData.permanentAddress}
-                  </li>
-                  <li>
-                    <strong>Pincode:</strong> {userData.pincode}
-                  </li>
-                </ul>
-              )}
+              {/* ✅ Display everything dynamically */}
+              <pre className="bg-gray-100 p-3 rounded-lg text-sm text-gray-800 overflow-x-auto whitespace-pre-wrap">
+                {JSON.stringify(responseData, null, 2)}
+              </pre>
             </div>
           )}
         </div>
