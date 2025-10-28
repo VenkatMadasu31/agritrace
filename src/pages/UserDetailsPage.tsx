@@ -8,6 +8,15 @@ const UserDetailsPage: React.FC = () => {
   const [presentAddress, setPresentAddress] = useState("");
   const [isDifferentAddress, setIsDifferentAddress] = useState(false);
   const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePic(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = () => {
     if (!profilePic)
@@ -27,27 +36,41 @@ const UserDetailsPage: React.FC = () => {
         </h1>
 
         <form className="space-y-4">
-          {/* Profile Picture */}
-          <div>
-            <label className="block font-semibold text-gray-700 mb-1">
+          {/* Profile Picture Upload */}
+          <div className="flex flex-col items-center">
+            <label className="block font-semibold text-gray-700 mb-2">
               Profile Picture <span className="text-red-500">*</span>
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              className="w-full border p-2 rounded"
-              onChange={(e) => setProfilePic(e.target.files?.[0] || null)}
-            />
+
+            <div className="relative w-32 h-32 rounded-full border-4 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:border-green-500 transition duration-300">
+              {preview ? (
+                <img
+                  src={preview}
+                  alt="Profile Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-gray-500 text-sm text-center px-2">
+                  Click to upload
+                </span>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleImageChange}
+              />
+            </div>
           </div>
 
           {/* User Details (readonly) */}
           {[
-            { label: "Phone", value: userData.phone },
-            { label: "Name", value: userData.name },
-            { label: "Date of Birth", value: userData.dob },
-            { label: "Gender", value: userData.gender },
-            { label: "Permanent Address", value: userData.permanentAddress },
-            { label: "Pincode", value: userData.pincode },
+            { label: "Phone", value: userData?.phone },
+            { label: "Name", value: userData?.name },
+            { label: "Date of Birth", value: userData?.dob },
+            { label: "Gender", value: userData?.gender },
+            { label: "Permanent Address", value: userData?.permanentAddress },
+            { label: "Pincode", value: userData?.pincode },
           ].map((field, idx) => (
             <div key={idx}>
               <label className="block font-semibold text-gray-700 mb-1">
@@ -55,7 +78,7 @@ const UserDetailsPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                value={field.value}
+                value={field.value || ""}
                 readOnly
                 className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
               />
@@ -95,7 +118,7 @@ const UserDetailsPage: React.FC = () => {
           <button
             type="button"
             onClick={handleSubmit}
-            className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold"
+            className="w-full py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold mt-4"
           >
             Submit
           </button>
